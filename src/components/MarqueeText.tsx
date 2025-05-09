@@ -26,9 +26,7 @@ const MarqueeText = ({ text }: { text: string }) => {
           transform: `translateX(${position}%)`,
         }}
       >
-        {text} {/* Add multiple instances to ensure continuous flow */}
-        {text}
-        {text}
+        {text} {text} {text}
       </div>
     </div>
   );
