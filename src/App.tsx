@@ -11,6 +11,7 @@ import ClientDetailPage from "./pages/ClientDetailPage";
 import AddClientPage from "./pages/AddClientPage";
 import EditClientPage from "./pages/EditClientPage";
 import NotFound from "./pages/NotFound";
+import MarqueeText from "./components/MarqueeText";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <MarqueeText text="☆彡 DIS MERCI A MOUCTAR ☆彡 " />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ClientType } from '@/types/client';
 import { Plus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
@@ -17,6 +18,13 @@ const formSchema = z.object({
   description: z.string().min(3, { message: 'Description requise' }),
   price: z.string().refine((val) => !isNaN(Number(val)), { message: 'Le prix doit être un nombre' }),
   measurements: z.string(),
+  bust: z.string().optional(),
+  waist: z.string().optional(),
+  hips: z.string().optional(),
+  shoulderWidth: z.string().optional(),
+  armLength: z.string().optional(),
+  inseam: z.string().optional(),
+  neck: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,6 +48,13 @@ const ClientForm = ({ onSave, initialData, buttonText = "Enregistrer" }: ClientF
       description: initialData?.description || '',
       price: initialData?.price ? String(initialData.price) : '',
       measurements: initialData?.measurements || '',
+      bust: initialData?.specificMeasurements?.bust ? String(initialData.specificMeasurements.bust) : '',
+      waist: initialData?.specificMeasurements?.waist ? String(initialData.specificMeasurements.waist) : '',
+      hips: initialData?.specificMeasurements?.hips ? String(initialData.specificMeasurements.hips) : '',
+      shoulderWidth: initialData?.specificMeasurements?.shoulderWidth ? String(initialData.specificMeasurements.shoulderWidth) : '',
+      armLength: initialData?.specificMeasurements?.armLength ? String(initialData.specificMeasurements.armLength) : '',
+      inseam: initialData?.specificMeasurements?.inseam ? String(initialData.specificMeasurements.inseam) : '',
+      neck: initialData?.specificMeasurements?.neck ? String(initialData.specificMeasurements.neck) : '',
     },
   });
 
@@ -67,8 +82,22 @@ const ClientForm = ({ onSave, initialData, buttonText = "Enregistrer" }: ClientF
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      const specificMeasurements = {
+        bust: data.bust ? Number(data.bust) : undefined,
+        waist: data.waist ? Number(data.waist) : undefined,
+        hips: data.hips ? Number(data.hips) : undefined,
+        shoulderWidth: data.shoulderWidth ? Number(data.shoulderWidth) : undefined,
+        armLength: data.armLength ? Number(data.armLength) : undefined,
+        inseam: data.inseam ? Number(data.inseam) : undefined,
+        neck: data.neck ? Number(data.neck) : undefined,
+      };
+
       const clientData = {
-        ...data,
+        name: data.name,
+        phone: data.phone,
+        description: data.description,
+        measurements: data.measurements,
+        specificMeasurements,
         price: Number(data.price),
         fabricPhoto: fabricPhoto || undefined,
         delivered: initialData?.delivered || false,
@@ -143,19 +172,122 @@ const ClientForm = ({ onSave, initialData, buttonText = "Enregistrer" }: ClientF
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="measurements"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mesures</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Détails des mesures..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="general">Mesures générales</TabsTrigger>
+            <TabsTrigger value="specific">Mesures spécifiques</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general">
+            <FormField
+              control={form.control}
+              name="measurements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mesures générales</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Détails des mesures..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </TabsContent>
+          <TabsContent value="specific">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="bust"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tour de poitrine (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Tour de poitrine" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="waist"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tour de taille (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Tour de taille" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="hips"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tour de hanches (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Tour de hanches" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="shoulderWidth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Largeur d'épaules (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Largeur d'épaules" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="armLength"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longueur de bras (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Longueur de bras" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="inseam"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Entrejambe (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Entrejambe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="neck"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tour de cou (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Tour de cou" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <FormField
           control={form.control}

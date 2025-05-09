@@ -89,6 +89,11 @@ export const generateSampleClients = (): void => {
       phone: '77 123 45 67',
       description: 'Robe de soirée bleu marine',
       measurements: 'Tour de poitrine: 92cm, Tour de taille: 75cm, Tour de hanches: 98cm',
+      specificMeasurements: {
+        bust: 92,
+        waist: 75,
+        hips: 98,
+      },
       price: 25000,
       fabricPhoto: 'https://images.unsplash.com/photo-1578140225210-49da25cdf9d6?q=80&w=300&auto=format&fit=crop',
       date: new Date('2023-10-15').toISOString(),
@@ -101,6 +106,11 @@ export const generateSampleClients = (): void => {
       phone: '76 987 65 43',
       description: 'Costume trois pièces gris',
       measurements: 'Épaules: 45cm, Tour de poitrine: 102cm, Tour de taille: 88cm',
+      specificMeasurements: {
+        shoulderWidth: 45,
+        bust: 102,
+        waist: 88
+      },
       price: 45000,
       date: new Date('2023-09-29').toISOString(),
       delivered: true,
@@ -112,6 +122,11 @@ export const generateSampleClients = (): void => {
       phone: '70 111 22 33',
       description: 'Ensemble pagne traditionnel',
       measurements: 'Tour de poitrine: 88cm, Tour de taille: 70cm, Tour de hanches: 94cm',
+      specificMeasurements: {
+        bust: 88,
+        waist: 70,
+        hips: 94
+      },
       price: 18000,
       fabricPhoto: 'https://images.unsplash.com/photo-1611043714658-af3e56bc5299?q=80&w=300&auto=format&fit=crop',
       date: new Date('2023-11-05').toISOString(),
@@ -124,6 +139,12 @@ export const generateSampleClients = (): void => {
       phone: '78 444 55 66',
       description: 'Chemise sur mesure en lin blanc',
       measurements: 'Cou: 39cm, Épaules: 44cm, Poitrine: 98cm, Longueur des manches: 65cm',
+      specificMeasurements: {
+        neck: 39,
+        shoulderWidth: 44,
+        bust: 98,
+        armLength: 65
+      },
       price: 15000,
       date: new Date('2023-08-20').toISOString(),
       delivered: true,
