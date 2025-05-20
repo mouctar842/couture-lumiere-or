@@ -1,90 +1,88 @@
-
 import { ClientType } from '@/types/client';
 
-// Simuler une base de données avec localStorage
-const STORAGE_KEY = 'couture_clients';
-
-// Charger les clients depuis localStorage
-const loadClients = (): ClientType[] => {
-  const clientsJson = localStorage.getItem(STORAGE_KEY);
-  if (!clientsJson) return [];
-  return JSON.parse(clientsJson);
-};
-
-// Sauvegarder les clients dans localStorage
-const saveClients = (clients: ClientType[]): void => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-};
+const API_URL = 'http://localhost:4000/api';
 
 // Obtenir tous les clients
-export const getAllClients = (): ClientType[] => {
-  return loadClients();
+export const getAllClients = async (): Promise<ClientType[]> => {
+  const response = await fetch(`${API_URL}/clients`);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des clients');
+  }
+  return response.json();
 };
 
 // Obtenir un client par ID
-export const getClientById = (id: string): ClientType | undefined => {
-  const clients = loadClients();
-  return clients.find(client => client.id === id);
+export const getClientById = async (id: string): Promise<ClientType | undefined> => {
+  const response = await fetch(`${API_URL}/clients/${id}`);
+  if (!response.ok) {
+    if (response.status === 404) return undefined;
+    throw new Error('Erreur lors de la récupération du client');
+  }
+  return response.json();
 };
 
 // Ajouter un nouveau client
-export const addClient = (client: Omit<ClientType, 'id'>): ClientType => {
-  const clients = loadClients();
-  const newClient = {
-    ...client,
-    id: Date.now().toString(),
-  };
-  clients.push(newClient);
-  saveClients(clients);
-  return newClient;
+export const addClient = async (client: Omit<ClientType, 'id'>): Promise<ClientType> => {
+  const response = await fetch(`${API_URL}/clients`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(client),
+  });
+  if (!response.ok) {
+    throw new Error('Erreur lors de l\'ajout du client');
+  }
+  return response.json();
 };
 
 // Mettre à jour un client existant
-export const updateClient = (id: string, clientData: Partial<ClientType>): ClientType | null => {
-  const clients = loadClients();
-  const index = clients.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  const updatedClient = { ...clients[index], ...clientData };
-  clients[index] = updatedClient;
-  saveClients(clients);
-  return updatedClient;
+export const updateClient = async (id: string, clientData: Partial<ClientType>): Promise<ClientType | null> => {
+  const response = await fetch(`${API_URL}/clients/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(clientData),
+  });
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error('Erreur lors de la mise à jour du client');
+  }
+  return response.json();
 };
 
 // Supprimer un client
-export const deleteClient = (id: string): boolean => {
-  const clients = loadClients();
-  const filteredClients = clients.filter(client => client.id !== id);
-  
-  if (filteredClients.length === clients.length) {
-    return false;
+export const deleteClient = async (id: string): Promise<boolean> => {
+  const response = await fetch(`${API_URL}/clients/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    if (response.status === 404) return false;
+    throw new Error('Erreur lors de la suppression du client');
   }
-  
-  saveClients(filteredClients);
   return true;
 };
 
 // Archiver un client
-export const archiveClient = (id: string): ClientType | null => {
+export const archiveClient = async (id: string): Promise<ClientType | null> => {
   return updateClient(id, { archived: true });
 };
 
 // Désarchiver un client
-export const unarchiveClient = (id: string): ClientType | null => {
+export const unarchiveClient = async (id: string): Promise<ClientType | null> => {
   return updateClient(id, { archived: false });
 };
 
 // Marquer un client comme livré
-export const markAsDelivered = (id: string): ClientType | null => {
+export const markAsDelivered = async (id: string): Promise<ClientType | null> => {
   return updateClient(id, { delivered: true });
 };
 
 // Générer des données de test
-export const generateSampleClients = (): void => {
-  const sampleClients: ClientType[] = [
+export const generateSampleClients = async (): Promise<void> => {
+  const sampleClients: Omit<ClientType, 'id'>[] = [
     {
-      id: '1',
       name: 'Marie Diop',
       phone: '77 123 45 67',
       description: 'Robe de soirée bleu marine',
@@ -101,7 +99,6 @@ export const generateSampleClients = (): void => {
       archived: false
     },
     {
-      id: '2',
       name: 'Amadou Ndiaye',
       phone: '76 987 65 43',
       description: 'Costume trois pièces gris',
@@ -117,7 +114,6 @@ export const generateSampleClients = (): void => {
       archived: false
     },
     {
-      id: '3',
       name: 'Fatou Sall',
       phone: '70 111 22 33',
       description: 'Ensemble pagne traditionnel',
@@ -134,7 +130,6 @@ export const generateSampleClients = (): void => {
       archived: false
     },
     {
-      id: '4',
       name: 'Omar Seck',
       phone: '78 444 55 66',
       description: 'Chemise sur mesure en lin blanc',
@@ -151,8 +146,11 @@ export const generateSampleClients = (): void => {
       archived: true
     }
   ];
-  
-  if (loadClients().length === 0) {
-    saveClients(sampleClients);
+
+  const clients = await getAllClients();
+  if (clients.length === 0) {
+    for (const client of sampleClients) {
+      await addClient(client);
+    }
   }
 };
